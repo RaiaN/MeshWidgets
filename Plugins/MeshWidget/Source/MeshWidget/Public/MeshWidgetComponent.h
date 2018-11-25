@@ -257,7 +257,7 @@ protected:
 	 * The owner player for a widget component, if this widget is drawn on the screen, this controls
 	 * what player's screen it appears on for split screen, if not set, users player 0.
 	 */
-	UPROPERTY()
+	UPROPERTY(Transient)
 	ULocalPlayer* OwnerPlayer;
 
 	/** The background color of the component */
@@ -301,6 +301,8 @@ protected:
 	
 	/** The Slate widget to be displayed by this component.  Only one of either Widget or SlateWidget can be used */
 	TSharedPtr<SWidget> SlateWidget;
+	
+	TSharedPtr<SWidget> NewSlateWidget;
 
 	/** The slate widget currently being drawn. */
 	TWeakPtr<SWidget> CurrentSlateWidget;

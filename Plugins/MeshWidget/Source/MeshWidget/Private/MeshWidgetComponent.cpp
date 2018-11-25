@@ -149,6 +149,9 @@ void UMeshWidgetComponent::ReleaseResources()
 	WidgetRenderer.Reset();
 	HitTestGrid.Reset();
 
+    SlateWidget.Reset();
+    NewSlateWidget.Reset();
+
 	UnregisterWindow();
 }
 
@@ -182,7 +185,7 @@ void UMeshWidgetComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 
     UpdateWidget();
 
-    if (Widget == nullptr && !SlateWidget.IsValid())
+    if (!IsValid(Widget) && !SlateWidget.IsValid())
     {
         return;
     }
@@ -213,17 +216,17 @@ bool UMeshWidgetComponent::ShouldDrawWidget() const
 
 void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 {
-	if ( GUsingNullRHI )
+    if (GUsingNullRHI)
+    {
+		return;
+	}
+
+	if (!SlateWindow.IsValid())
 	{
 		return;
 	}
 
-	if ( !SlateWindow.IsValid() )
-	{
-		return;
-	}
-
-	if ( DrawSize.X == 0 || DrawSize.Y == 0 )
+	if (DrawSize.X == 0 || DrawSize.Y == 0)
 	{
 		return;
 	}
@@ -232,7 +235,7 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 
 	const float DrawScale = 1.0f;
 
-	if ( bDrawAtDesiredSize )
+	if (bDrawAtDesiredSize)
 	{
 		SlateWindow->SlatePrepass(DrawScale);
 
@@ -248,7 +251,7 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 		WidgetRenderer->SetIsPrepassNeeded(true);
 	}
 
-	if ( CurrentDrawSize != DrawSize )
+	if (CurrentDrawSize != DrawSize)
 	{
 		DrawSize = CurrentDrawSize;
 		RecreatePhysicsState();
@@ -264,7 +267,8 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 		SlateWindow.ToSharedRef(),
 		DrawScale,
 		CurrentDrawSize,
-		DeltaTime);
+		DeltaTime
+    );
 
 	LastWidgetRenderTime = GetWorld()->TimeSeconds;
 }
@@ -300,7 +304,7 @@ public:
 
 FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
 {
-	return new FMeshWidgetComponentInstanceData( this );
+	return new FMeshWidgetComponentInstanceData(this);
 }
 
 void UMeshWidgetComponent::ApplyComponentInstanceData(FMeshWidgetComponentInstanceData* WidgetInstanceData)
@@ -380,13 +384,13 @@ void UMeshWidgetComponent::InitWidget()
 	// Don't do any work if Slate is not initialized
 	if ( FSlateApplication::IsInitialized() )
 	{
-		if ( WidgetClass && Widget == nullptr && GetWorld() )
+		if ( WidgetClass && !IsValid(Widget) && GetWorld() )
 		{
 			Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 		}
 		
 #if WITH_EDITOR
-		if ( Widget && !GetWorld()->IsGameWorld() && !bEditTimeUsable )
+		if ( IsValid(Widget) && !GetWorld()->IsGameWorld() && !bEditTimeUsable )
 		{
 			if( !GEnableVREditorHacks )
 			{
@@ -413,9 +417,9 @@ ULocalPlayer* UMeshWidgetComponent::GetOwnerPlayer() const
 
 void UMeshWidgetComponent::SetWidget(UUserWidget* InWidget)
 {
-	if( InWidget != nullptr )
+	if (IsValid(InWidget))
 	{
-		SetSlateWidget( nullptr );
+		SetSlateWidget(nullptr);
 	}
 
 	Widget = InWidget;
@@ -425,9 +429,9 @@ void UMeshWidgetComponent::SetWidget(UUserWidget* InWidget)
 
 void UMeshWidgetComponent::SetSlateWidget( const TSharedPtr<SWidget>& InSlateWidget )
 {
-	if( Widget != nullptr )
+    if (IsValid(Widget))
 	{
-		SetWidget( nullptr );
+		SetWidget(nullptr);
 	}
 
 	if( SlateWidget.IsValid() )
@@ -445,8 +449,7 @@ void UMeshWidgetComponent::UpdateWidget()
 	// Don't do any work if Slate is not initialized
 	if ( FSlateApplication::IsInitialized() )
 	{
-		TSharedPtr<SWidget> NewSlateWidget;
-		if (Widget)
+		if (IsValid(Widget))
 		{
 			NewSlateWidget = Widget->TakeWidget();
 		}
@@ -743,7 +746,7 @@ UMaterialInterface* UMeshWidgetComponent::GetMaterial(int32 MaterialIndex) const
 
 UMaterialInterface* UMeshWidgetComponent::GetBaseMaterial() const
 {
-	switch ( BlendMode )
+	switch (BlendMode)
 	{
 	case EWidgetBlendMode::Opaque:
 		return bIsTwoSided ? OpaqueMaterial : OpaqueMaterial_OneSided;
@@ -765,7 +768,7 @@ int32 UMeshWidgetComponent::GetNumMaterials() const
 
 void UMeshWidgetComponent::UpdateMaterialInstanceParameters()
 {
-	if ( MaterialInstance )
+	if (MaterialInstance)
 	{
 		MaterialInstance->SetTextureParameterValue("SlateUI", RenderTarget);
 		MaterialInstance->SetVectorParameterValue("TintColorAndOpacity", TintColorAndOpacity);
