@@ -49,7 +49,7 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	BodyInstance.SetCollisionProfileName(FName(TEXT("UI")));
 
 	// Translucent material instances
-	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_OneSided_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent_OneSided"));
 	TranslucentMaterial = TranslucentMaterial_Finder.Object;
 	TranslucentMaterial_OneSided = TranslucentMaterial_OneSided_Finder.Object;
@@ -64,7 +64,7 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Masked"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterial_OneSided_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Masked_OneSided"));
 	MaskedMaterial = MaskedMaterial_Finder.Object;
-	MaskedMaterial_OneSided = MaskedMaterial_OneSided_Finder.Object;*/
+	MaskedMaterial_OneSided = MaskedMaterial_OneSided_Finder.Object;
 
 	LastLocalHitLocation = FVector2D::ZeroVector;
 	bUseEditorCompositing = false;
