@@ -19,17 +19,20 @@ public class MeshWidget : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "InputCore",
-                "Slate",
-                "SlateCore",
-                "SlateRHIRenderer",
-                "UnrealEd",
                 "UMG",
                 "RenderCore",
                 "RHI"
             }
         );
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(
+            new string[] {
+                "Slate",
+                "SlateCore",
+                "SlateRHIRenderer",
+                "UnrealEd"
+            }
+        );
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
