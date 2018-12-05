@@ -35,7 +35,7 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	, BackgroundColor(FLinearColor::Transparent)
 	, TintColorAndOpacity(FLinearColor::White)
 	, OpacityFromTexture(1.0f)
-	, BlendMode( EWidgetBlendMode::Masked )
+	, BlendMode(EWidgetBlendMode::Masked)
 	, bIsOpaque_DEPRECATED(false)
 	, bIsTwoSided(false)
 	, ParabolaDistortion(0)
@@ -49,13 +49,13 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	BodyInstance.SetCollisionProfileName(FName(TEXT("UI")));
 
 	// Translucent material instances
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_Finder( TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent") );
+	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TranslucentMaterial_OneSided_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Translucent_OneSided"));
 	TranslucentMaterial = TranslucentMaterial_Finder.Object;
 	TranslucentMaterial_OneSided = TranslucentMaterial_OneSided_Finder.Object;
 
 	// Opaque material instances
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> OpaqueMaterial_Finder( TEXT( "/Engine/EngineMaterials/Widget3DPassThrough_Opaque" ) );
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> OpaqueMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Opaque"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> OpaqueMaterial_OneSided_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Opaque_OneSided"));
 	OpaqueMaterial = OpaqueMaterial_Finder.Object;
 	OpaqueMaterial_OneSided = OpaqueMaterial_OneSided_Finder.Object;
@@ -64,10 +64,9 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterial_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Masked"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaskedMaterial_OneSided_Finder(TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Masked_OneSided"));
 	MaskedMaterial = MaskedMaterial_Finder.Object;
-	MaskedMaterial_OneSided = MaskedMaterial_OneSided_Finder.Object;
+	MaskedMaterial_OneSided = MaskedMaterial_OneSided_Finder.Object;*/
 
 	LastLocalHitLocation = FVector2D::ZeroVector;
-	//bGenerateOverlapEvents = false;
 	bUseEditorCompositing = false;
 
 	bUseLegacyRotation = false;
@@ -85,7 +84,7 @@ void UMeshWidgetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UMeshWidgetComponent::OnRegister()
 {
-    UE_LOG(LogTemp, Log, TEXT("OnRegister"));
+    // UE_LOG(LogTemp, Log, TEXT("OnRegister"));
 
 	Super::OnRegister();
 
@@ -99,7 +98,7 @@ void UMeshWidgetComponent::OnRegister()
 
 void UMeshWidgetComponent::OnUnregister()
 {
-    UE_LOG(LogTemp, Log, TEXT("OnUnregister"));
+    // UE_LOG(LogTemp, Log, TEXT("OnUnregister"));
 
     Super::OnUnregister();    
 
@@ -160,7 +159,7 @@ void UMeshWidgetComponent::InitWidget()
 
 void UMeshWidgetComponent::ReleaseResources()
 {
-    UE_LOG(LogTemp, Log, TEXT("ReleaseResources"));
+    // UE_LOG(LogTemp, Log, TEXT("ReleaseResources"));
 
     // do not reset widget renderer manually since it implements FDeferredCleanupInterface
 	// WidgetRenderer.Reset();
@@ -176,9 +175,9 @@ void UMeshWidgetComponent::ReleaseResources()
 
 void UMeshWidgetComponent::RegisterWindow()
 {
-	if ( SlateWindow.IsValid() )
+	if (SlateWindow.IsValid())
 	{
-		if ( FSlateApplication::IsInitialized() )
+		if (FSlateApplication::IsInitialized())
 		{
 			FSlateApplication::Get().RegisterVirtualWindow(SlateWindow.ToSharedRef());
 		}
@@ -187,9 +186,9 @@ void UMeshWidgetComponent::RegisterWindow()
 
 void UMeshWidgetComponent::UnregisterWindow()
 {
-	if ( SlateWindow.IsValid() )
+	if (SlateWindow.IsValid())
 	{
-		if ( FSlateApplication::IsInitialized() )
+		if (FSlateApplication::IsInitialized())
 		{
 			FSlateApplication::Get().UnregisterVirtualWindow(SlateWindow.ToSharedRef());
 		}
@@ -287,7 +286,7 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
         DrawScale,
         CurrentDrawSize,
         DeltaTime
-    );
+   );
 
 	LastWidgetRenderTime = GetWorld()->TimeSeconds;
 }
@@ -295,10 +294,10 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 class FMeshWidgetComponentInstanceData : public FSceneComponentInstanceData
 {
 public:
-	FMeshWidgetComponentInstanceData( const UMeshWidgetComponent* SourceComponent )
+	FMeshWidgetComponentInstanceData(const UMeshWidgetComponent* SourceComponent)
 		: FSceneComponentInstanceData(SourceComponent)
-		, WidgetClass ( SourceComponent->GetWidgetClass() )
-		, RenderTarget( SourceComponent->GetRenderTarget() )
+		, WidgetClass (SourceComponent->GetWidgetClass())
+		, RenderTarget(SourceComponent->GetRenderTarget())
 	{}
 
 	virtual void ApplyToComponent(UActorComponent* Component, const ECacheApplyPhase CacheApplyPhase) override
@@ -339,7 +338,7 @@ void UMeshWidgetComponent::ApplyComponentInstanceData(FMeshWidgetComponentInstan
 	}
 
 	RenderTarget = WidgetInstanceData->RenderTarget;
-	if( MaterialInstance && RenderTarget )
+	if (MaterialInstance && RenderTarget)
 	{
 		MaterialInstance->SetTextureParameterValue("SlateUI", RenderTarget);
 	}
@@ -352,7 +351,7 @@ void UMeshWidgetComponent::PostEditChangeProperty(FPropertyChangedEvent& Propert
 {
 	UProperty* Property = PropertyChangedEvent.MemberProperty;
 
-	if( Property && PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive )
+	if (Property && PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive)
 	{
 		static FName DrawSizeName("DrawSize");
 		static FName PivotName("Pivot");
@@ -363,11 +362,11 @@ void UMeshWidgetComponent::PostEditChangeProperty(FPropertyChangedEvent& Propert
 		static FName TintColorAndOpacityName("TintColorAndOpacity");
 		static FName OpacityFromTextureName("OpacityFromTexture");
 		static FName ParabolaDistortionName(TEXT("ParabolaDistortion"));
-		static FName BlendModeName( TEXT( "BlendMode" ) );
+		static FName BlendModeName(TEXT("BlendMode"));
 
 		auto PropertyName = Property->GetFName();
 
-		if( PropertyName == WidgetClassName )
+		if (PropertyName == WidgetClassName)
 		{
 			//in editor rendering is not working so this does nothing
 			//Widget = nullptr;
@@ -375,20 +374,20 @@ void UMeshWidgetComponent::PostEditChangeProperty(FPropertyChangedEvent& Propert
 			//UpdateWidget();
 			MarkRenderStateDirty();
 		}
-		else if ( PropertyName == DrawSizeName || PropertyName == PivotName )
+		else if (PropertyName == DrawSizeName || PropertyName == PivotName)
 		{
 			MarkRenderStateDirty();
 			RecreatePhysicsState();
 		}
-		else if ( PropertyName == IsOpaqueName || PropertyName == IsTwoSidedName || PropertyName == BlendModeName )
+		else if (PropertyName == IsOpaqueName || PropertyName == IsTwoSidedName || PropertyName == BlendModeName)
 		{
 			MarkRenderStateDirty();
 		}
-		else if( PropertyName == BackgroundColorName || PropertyName == ParabolaDistortionName )
+		else if (PropertyName == BackgroundColorName || PropertyName == ParabolaDistortionName)
 		{
 			MarkRenderStateDirty();
 		}
-		else if( PropertyName == TintColorAndOpacityName || PropertyName == OpacityFromTextureName )
+		else if (PropertyName == TintColorAndOpacityName || PropertyName == OpacityFromTextureName)
 		{
 			MarkRenderStateDirty();
 		}
@@ -408,7 +407,7 @@ void UMeshWidgetComponent::SetOwnerPlayer(ULocalPlayer* LocalPlayer)
 
 ULocalPlayer* UMeshWidgetComponent::GetOwnerPlayer() const
 {
-	return OwnerPlayer ? OwnerPlayer : GEngine->GetLocalPlayerFromControllerId(GetWorld(), 0);
+	return IsValid(OwnerPlayer) ? OwnerPlayer : GEngine->GetLocalPlayerFromControllerId(GetWorld(), 0);
 }
 
 void UMeshWidgetComponent::SetWidget(UUserWidget* InWidget)
@@ -423,14 +422,14 @@ void UMeshWidgetComponent::SetWidget(UUserWidget* InWidget)
 	UpdateWidget();
 }
 
-void UMeshWidgetComponent::SetSlateWidget( const TSharedPtr<SWidget>& InSlateWidget )
+void UMeshWidgetComponent::SetSlateWidget(const TSharedPtr<SWidget>& InSlateWidget)
 {
     if (IsValid(Widget))
 	{
 		SetWidget(nullptr);
 	}
 
-	if( SlateWidget.IsValid() )
+	if (SlateWidget.IsValid())
 	{
 		SlateWidget.Reset();
 	}
@@ -443,38 +442,38 @@ void UMeshWidgetComponent::SetSlateWidget( const TSharedPtr<SWidget>& InSlateWid
 void UMeshWidgetComponent::UpdateWidget()
 {
 	// Don't do any work if Slate is not initialized
-	if ( FSlateApplication::IsInitialized() )
+	if (FSlateApplication::IsInitialized())
 	{
 		if (IsValid(Widget))
 		{
 			NewSlateWidget = Widget->TakeWidget();
 		}
 
-		if ( !SlateWindow.IsValid() )
+		if (!SlateWindow.IsValid())
 		{
 			SlateWindow = SNew(SVirtualWindow).Size(DrawSize);
 			SlateWindow->SetIsFocusable(bWindowFocusable);
 			RegisterWindow();
 		}
 
-		if ( !HitTestGrid.IsValid() )
+		if (!HitTestGrid.IsValid())
 		{
 			HitTestGrid = MakeShareable(new FHittestGrid);
 		}
 
 		SlateWindow->Resize(DrawSize);
 
-		if ( NewSlateWidget.IsValid() )
+		if (NewSlateWidget.IsValid())
 		{
-			if ( NewSlateWidget != CurrentSlateWidget )
+			if (NewSlateWidget != CurrentSlateWidget)
 			{
 				CurrentSlateWidget = NewSlateWidget;
 				SlateWindow->SetContent(NewSlateWidget.ToSharedRef());
 			}
 		}
-		else if( SlateWidget.IsValid() )
+		else if (SlateWidget.IsValid())
 		{
-			if ( SlateWidget != CurrentSlateWidget )
+			if (SlateWidget != CurrentSlateWidget)
 			{
 				CurrentSlateWidget = SlateWidget;
 				SlateWindow->SetContent(SlateWidget.ToSharedRef());
@@ -483,7 +482,7 @@ void UMeshWidgetComponent::UpdateWidget()
 		else
 		{
 			CurrentSlateWidget = SNullWidget::NullWidget;
-			SlateWindow->SetContent( SNullWidget::NullWidget );
+			SlateWindow->SetContent(SNullWidget::NullWidget);
 		}
 	}
 }
@@ -494,17 +493,17 @@ void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
 	bool bClearColorChanged = false;
 
 	FLinearColor ActualBackgroundColor = BackgroundColor;
-	switch ( BlendMode )
+	switch (BlendMode)
 	{
-	case EWidgetBlendMode::Opaque:
-		ActualBackgroundColor.A = 1.0f;
-	case EWidgetBlendMode::Masked:
-		ActualBackgroundColor.A = 0.0f;
+	    case EWidgetBlendMode::Opaque:
+		    ActualBackgroundColor.A = 1.0f;
+	    case EWidgetBlendMode::Masked:
+		    ActualBackgroundColor.A = 0.0f;
 	}
 
-	if ( DesiredRenderTargetSize.X != 0 && DesiredRenderTargetSize.Y != 0 )
+	if (DesiredRenderTargetSize.X != 0 && DesiredRenderTargetSize.Y != 0)
 	{
-		if ( RenderTarget == nullptr )
+		if (RenderTarget == nullptr)
 		{
 			RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 			RenderTarget->ClearColor = ActualBackgroundColor;
@@ -518,7 +517,7 @@ void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
 		else
 		{
 			// Update the format
-			if ( RenderTarget->SizeX != DesiredRenderTargetSize.X || RenderTarget->SizeY != DesiredRenderTargetSize.Y )
+			if (RenderTarget->SizeX != DesiredRenderTargetSize.X || RenderTarget->SizeY != DesiredRenderTargetSize.Y)
 			{
 				RenderTarget->InitCustomFormat(DesiredRenderTargetSize.X, DesiredRenderTargetSize.Y, PF_B8G8R8A8, false);
 				RenderTarget->UpdateResourceImmediate(false);
@@ -526,23 +525,23 @@ void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
 			}
 
 			// Update the clear color
-			if ( RenderTarget->ClearColor != ActualBackgroundColor )
+			if (RenderTarget->ClearColor != ActualBackgroundColor)
 			{
 				RenderTarget->ClearColor = ActualBackgroundColor;
 				bClearColorChanged = bWidgetRenderStateDirty = true;
 			}
 
-			if ( bWidgetRenderStateDirty )
+			if (bWidgetRenderStateDirty)
 			{
 				RenderTarget->UpdateResource();
 			}
 		}
 	}
 
-	if ( RenderTarget )
+	if (RenderTarget)
 	{
 		// If the clear color of the render target changed, update the BackColor of the material to match
-		if ( bClearColorChanged )
+		if (bClearColorChanged)
 		{
 			MaterialInstance->SetVectorParameterValue("BackColor", RenderTarget->ClearColor);
 		}
@@ -550,12 +549,12 @@ void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
 		static FName ParabolaDistortionName(TEXT("ParabolaDistortion"));
 
 		float CurrentParabolaValue;
-		if ( MaterialInstance->GetScalarParameterValue(ParabolaDistortionName, CurrentParabolaValue) && CurrentParabolaValue != ParabolaDistortion )
+		if (MaterialInstance->GetScalarParameterValue(ParabolaDistortionName, CurrentParabolaValue) && CurrentParabolaValue != ParabolaDistortion)
 		{
 			MaterialInstance->SetScalarParameterValue(ParabolaDistortionName, ParabolaDistortion);
 		}
 
-		if ( bWidgetRenderStateDirty )
+		if (bWidgetRenderStateDirty)
 		{
 			MarkRenderStateDirty();
 		}
@@ -595,7 +594,7 @@ TArray<FWidgetAndPointer> UMeshWidgetComponent::GetHitWidgetPath(const FHitResul
 {
 	FVector2D LocalHitLocation = GetLocalHitLocation(Hit);
 
-	TSharedRef<FVirtualPointerPosition> VirtualMouseCoordinate = MakeShareable( new FVirtualPointerPosition );
+	TSharedRef<FVirtualPointerPosition> VirtualMouseCoordinate = MakeShareable(new FVirtualPointerPosition);
 
 	VirtualMouseCoordinate->CurrentCursorPosition = LocalHitLocation;
 	VirtualMouseCoordinate->LastCursorPosition = LastLocalHitLocation;
@@ -604,11 +603,11 @@ TArray<FWidgetAndPointer> UMeshWidgetComponent::GetHitWidgetPath(const FHitResul
 	LastLocalHitLocation = LocalHitLocation;
 
 	TArray<FWidgetAndPointer> ArrangedWidgets;
-	if ( HitTestGrid.IsValid() )
+	if (HitTestGrid.IsValid())
 	{
-		ArrangedWidgets = HitTestGrid->GetBubblePath( LocalHitLocation, CursorRadius, bIgnoreEnabledStatus );
+		ArrangedWidgets = HitTestGrid->GetBubblePath(LocalHitLocation, CursorRadius, bIgnoreEnabledStatus);
 
-		for( FWidgetAndPointer& ArrangedWidget : ArrangedWidgets )
+		for(FWidgetAndPointer& ArrangedWidget : ArrangedWidgets)
 		{
 			ArrangedWidget.PointerPosition = VirtualMouseCoordinate;
 		}
@@ -631,7 +630,7 @@ void UMeshWidgetComponent::SetDrawSize(FVector2D Size)
 {
 	FIntPoint NewDrawSize((int32)Size.X, (int32)Size.Y);
 
-	if ( NewDrawSize != DrawSize )
+	if (NewDrawSize != DrawSize)
 	{
 		DrawSize = NewDrawSize;
 		MarkRenderStateDirty();
@@ -644,51 +643,51 @@ void UMeshWidgetComponent::RequestRedraw()
 	bRedrawRequested = true;
 }
 
-void UMeshWidgetComponent::SetBlendMode( const EWidgetBlendMode NewBlendMode )
+void UMeshWidgetComponent::SetBlendMode(const EWidgetBlendMode NewBlendMode)
 {
-	if( NewBlendMode != this->BlendMode )
+	if (NewBlendMode != this->BlendMode)
 	{
 		this->BlendMode = NewBlendMode;
-		if( IsRegistered() )
+		if (IsRegistered())
 		{
 			MarkRenderStateDirty();
 		}
 	}
 }
 
-void UMeshWidgetComponent::SetTwoSided( const bool bWantTwoSided )
+void UMeshWidgetComponent::SetTwoSided(const bool bWantTwoSided)
 {
-	if( bWantTwoSided != this->bIsTwoSided )
+	if (bWantTwoSided != this->bIsTwoSided)
 	{
 		this->bIsTwoSided = bWantTwoSided;
-		if( IsRegistered() )
+		if (IsRegistered())
 		{
 			MarkRenderStateDirty();
 		}
 	}
 }
 
-void UMeshWidgetComponent::SetBackgroundColor( const FLinearColor NewBackgroundColor )
+void UMeshWidgetComponent::SetBackgroundColor(const FLinearColor NewBackgroundColor)
 {
-	if( NewBackgroundColor != this->BackgroundColor)
+	if (NewBackgroundColor != this->BackgroundColor)
 	{
 		this->BackgroundColor = NewBackgroundColor;
 		MarkRenderStateDirty();
 	}
 }
 
-void UMeshWidgetComponent::SetTintColorAndOpacity( const FLinearColor NewTintColorAndOpacity )
+void UMeshWidgetComponent::SetTintColorAndOpacity(const FLinearColor NewTintColorAndOpacity)
 {
-	if( NewTintColorAndOpacity != this->TintColorAndOpacity )
+	if (NewTintColorAndOpacity != this->TintColorAndOpacity)
 	{
 		this->TintColorAndOpacity = NewTintColorAndOpacity;
 		UpdateMaterialInstanceParameters();
 	}
 }
 
-void UMeshWidgetComponent::SetOpacityFromTexture( const float NewOpacityFromTexture )
+void UMeshWidgetComponent::SetOpacityFromTexture(const float NewOpacityFromTexture)
 {
-	if( NewOpacityFromTexture != this->OpacityFromTexture )
+	if (NewOpacityFromTexture != this->OpacityFromTexture)
 	{
 		this->OpacityFromTexture = NewOpacityFromTexture;
 		UpdateMaterialInstanceParameters();
@@ -704,21 +703,21 @@ void UMeshWidgetComponent::PostLoad()
 {
 	Super::PostLoad();
 
-	if ( GetLinkerUE4Version() < VER_UE4_ADD_PIVOT_TO_WIDGET_COMPONENT )
+	if (GetLinkerUE4Version() < VER_UE4_ADD_PIVOT_TO_WIDGET_COMPONENT)
 	{
 		Pivot = FVector2D(0, 0);
 	}
 
-	if ( GetLinkerUE4Version() < VER_UE4_ADD_BLEND_MODE_TO_WIDGET_COMPONENT )
+	if (GetLinkerUE4Version() < VER_UE4_ADD_BLEND_MODE_TO_WIDGET_COMPONENT)
 	{
 		BlendMode = bIsOpaque_DEPRECATED ? EWidgetBlendMode::Opaque : EWidgetBlendMode::Transparent;
 	}
 
-	if( GetLinkerUE4Version() < VER_UE4_FIXED_DEFAULT_ORIENTATION_OF_WIDGET_COMPONENT )
+	if (GetLinkerUE4Version() < VER_UE4_FIXED_DEFAULT_ORIENTATION_OF_WIDGET_COMPONENT)
 	{	
 		// This indicates the value does not differ from the default.  In some rare cases this could cause incorrect rotation for anyone who directly set a value of 0,0,0 for rotation
 		// However due to delta serialization we have no way to know if this value is actually different from the default so assume it is not.
-		if( RelativeRotation == FRotator::ZeroRotator )
+		if (RelativeRotation == FRotator::ZeroRotator)
 		{
 			RelativeRotation = FRotator(0.f, 0.f, 90.f);
 		}
@@ -728,7 +727,7 @@ void UMeshWidgetComponent::PostLoad()
 
 UMaterialInterface* UMeshWidgetComponent::GetMaterial(int32 MaterialIndex) const
 {
-	if ( OverrideMaterials.IsValidIndex(MaterialIndex) && ( OverrideMaterials[MaterialIndex] != nullptr ) )
+	if (OverrideMaterials.IsValidIndex(MaterialIndex) && (OverrideMaterials[MaterialIndex] != nullptr))
 	{
 		return OverrideMaterials[MaterialIndex];
 	}
@@ -744,15 +743,15 @@ UMaterialInterface* UMeshWidgetComponent::GetBaseMaterial() const
 {
 	switch (BlendMode)
 	{
-	case EWidgetBlendMode::Opaque:
-		return bIsTwoSided ? OpaqueMaterial : OpaqueMaterial_OneSided;
-		break;
-	case EWidgetBlendMode::Masked:
-		return bIsTwoSided ? MaskedMaterial : MaskedMaterial_OneSided;
-		break;
-	case EWidgetBlendMode::Transparent:
-		return bIsTwoSided ? TranslucentMaterial : TranslucentMaterial_OneSided;
-		break;
+	    case EWidgetBlendMode::Opaque:
+		    return bIsTwoSided ? OpaqueMaterial : OpaqueMaterial_OneSided;
+		    break;
+	    case EWidgetBlendMode::Masked:
+		    return bIsTwoSided ? MaskedMaterial : MaskedMaterial_OneSided;
+		    break;
+	    case EWidgetBlendMode::Transparent:
+		    return bIsTwoSided ? TranslucentMaterial : TranslucentMaterial_OneSided;
+		    break;
 	}
 	return nullptr;
 }
@@ -764,7 +763,7 @@ int32 UMeshWidgetComponent::GetNumMaterials() const
 
 void UMeshWidgetComponent::UpdateMaterialInstanceParameters()
 {
-	if (MaterialInstance)
+	if (IsValid(MaterialInstance))
 	{
 		MaterialInstance->SetTextureParameterValue("SlateUI", RenderTarget);
 		MaterialInstance->SetVectorParameterValue("TintColorAndOpacity", TintColorAndOpacity);

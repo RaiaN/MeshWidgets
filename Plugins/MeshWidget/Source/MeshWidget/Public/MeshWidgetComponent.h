@@ -292,29 +292,32 @@ protected:
 	/** The slate widget currently being drawn. */
 	TWeakPtr<SWidget> CurrentSlateWidget;
 
+    /* MATERIALS BEGIN */
 	/** The material instance for translucent widget components */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category=Material)
 	UMaterialInterface* TranslucentMaterial;
 
 	/** The material instance for translucent, one-sided widget components */
-	UPROPERTY()
+    UPROPERTY(EditAnywhere, Category = Material)
 	UMaterialInterface* TranslucentMaterial_OneSided;
 
 	/** The material instance for opaque widget components */
-	UPROPERTY()
+    UPROPERTY(EditAnywhere, Category = Material)
 	UMaterialInterface* OpaqueMaterial;
 
 	/** The material instance for opaque, one-sided widget components */
-	UPROPERTY()
+    UPROPERTY(EditAnywhere, Category = Material)
 	UMaterialInterface* OpaqueMaterial_OneSided;
 
 	/** The material instance for masked widget components. */
-	UPROPERTY()
+    UPROPERTY(EditAnywhere, Category = Material)
 	UMaterialInterface* MaskedMaterial;
 
 	/** The material instance for masked, one-sided widget components. */
-	UPROPERTY()
+    UPROPERTY(EditAnywhere, Category = Material)
 	UMaterialInterface* MaskedMaterial_OneSided;
+
+    /* MATERIALS END */
 
 	/** The target to which the user widget is rendered */
 	UPROPERTY(Transient, DuplicateTransient)
