@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "WidgetComponent.h"
-#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
 #include "MeshWidgetComponent.generated.h"
 
 struct FVirtualPointerPosition;
 
+class UUserWidget;
 
-UCLASS(Blueprintable, hidecategories=(Object,Activation,"Components|Activation",Sockets,Base,Lighting,LOD,Mesh), editinlinenew, meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, hidecategories=(Object,Activation,"Components|Activation",Sockets,Base,Lighting,LOD,Mesh), editinlinenew, meta=(BlueprintSpawnableComponent))
 class MESHWIDGET_API UMeshWidgetComponent : public UStaticMeshComponent
 {
 	GENERATED_UCLASS_BODY()
@@ -77,7 +77,7 @@ public:
 	TSubclassOf<UUserWidget> GetWidgetClass() const { return WidgetClass; }
 
 	/** @return The user widget object displayed by this component */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	UUserWidget* GetUserWidgetObject() const;
 
 	/** @return Returns the Slate widget that was assigned to this component, if any */
@@ -87,11 +87,11 @@ public:
 	TArray<FWidgetAndPointer> GetHitWidgetPath(const FHitResult& Hit, bool bIgnoreEnabledStatus, float CursorRadius = 0.0f);
 
 	/** @return The render target to which the user widget is rendered */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	UTextureRenderTarget2D* GetRenderTarget() const;
 
 	/** @return The dynamic material instance used to render the user widget */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	UMaterialInstanceDynamic* GetMaterialInstance() const;
 
 	/** @return The window containing the user widget content */
@@ -101,7 +101,7 @@ public:
 	 *  Sets the widget to use directly. This function will keep track of the widget till the next time it's called
 	 *	with either a newer widget or a nullptr
 	 */ 
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	virtual void SetWidget(UUserWidget* Widget);
 
 	/**  
@@ -115,23 +115,23 @@ public:
 	 * which player's viewport the widget appears on in a split screen scenario.  Additionally it
 	 * forwards the owning player to the actual UserWidget that is spawned.
 	 */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	void SetOwnerPlayer(ULocalPlayer* LocalPlayer);
 
 	/** Gets the local player that owns this widget component. */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	ULocalPlayer* GetOwnerPlayer() const;
 
 	/** @return The draw size of the quad in the world */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	FVector2D GetDrawSize() const;
 
 	/** Sets the draw size of the quad in the world */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	void SetDrawSize(FVector2D Size);
 
 	/** Requests that the widget be redrawn.  */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	virtual void RequestRedraw();
 
 	/** Gets the blend mode for the widget. */
@@ -144,7 +144,7 @@ public:
 	void SetTwoSided( const bool bWantTwoSided );
 
 	/** Sets the background color and opacityscale for this widget */
-	UFUNCTION(BlueprintCallable, Category=UserInterface)
+	UFUNCTION(BlueprintCallable, Category = UserInterface)
 	void SetBackgroundColor( const FLinearColor NewBackgroundColor );
 
 	/** Sets the tint color and opacity scale for this widget */
@@ -186,15 +186,15 @@ protected:
 protected:
 
 	/** The class of User Widget to create and display an instance of */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	TSubclassOf<UUserWidget> WidgetClass;
 	
 	/** The size of the displayed quad. */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	FIntPoint DrawSize;
 
 	/** Should we wait to be told to redraw to actually draw? */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	bool bManuallyRedraw;
 
 	/** Has anyone requested we redraw? */
@@ -206,7 +206,7 @@ protected:
 	 * This will work with bManuallyRedraw as well.  So you can say, manually redraw, but only redraw at this
 	 * maximum rate.
 	 */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	float RedrawTime;
 
 	/** What was the last time we rendered the widget? */
@@ -214,7 +214,7 @@ protected:
 	float LastWidgetRenderTime;
 
 	/** Is the virtual window created to host the widget focusable? */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	bool bWindowFocusable;
 
 	/**
@@ -231,11 +231,11 @@ protected:
 	 *    that effect, you should keep the outer widget's sized locked and dynamically
 	 *    scale or resize some inner widget.
 	 */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	bool bDrawAtDesiredSize;
 
 	/** The Alignment/Pivot point that the widget is placed at relative to the position. */
-	UPROPERTY(EditAnywhere, Category=UserInterface)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	FVector2D Pivot;
 
 	/**
@@ -246,26 +246,26 @@ protected:
 	ULocalPlayer* OwnerPlayer;
 
 	/** The background color of the component */
-	UPROPERTY(EditAnywhere, Category=Rendering)
+	UPROPERTY(EditAnywhere, Category = Rendering)
 	FLinearColor BackgroundColor;
 
 	/** Tint color and opacity for this component */
-	UPROPERTY(EditAnywhere, Category=Rendering)
+	UPROPERTY(EditAnywhere, Category = Rendering)
 	FLinearColor TintColorAndOpacity;
 
 	/** Sets the amount of opacity from the widget's UI texture to use when rendering the translucent or masked UI to the viewport (0.0-1.0) */
-	UPROPERTY(EditAnywhere, Category=Rendering, meta=(ClampMin=0.0f, ClampMax=1.0f))
+	UPROPERTY(EditAnywhere, Category = Rendering, meta=(ClampMin=0.0f, ClampMax=1.0f))
 	float OpacityFromTexture;
 
 	/** The blend mode for the widget. */
-	UPROPERTY(EditAnywhere, Category=Rendering)
+	UPROPERTY(EditAnywhere, Category = Rendering)
 	EWidgetBlendMode BlendMode;
 
 	UPROPERTY()
 	bool bIsOpaque_DEPRECATED;
 
 	/** Is the component visible from behind? */
-	UPROPERTY(EditAnywhere, Category=Rendering)
+	UPROPERTY(EditAnywhere, Category = Rendering)
 	bool bIsTwoSided;
 	
 	/**
@@ -273,7 +273,7 @@ protected:
 	 * that it's on a curved surface in front of the users face.  This only works for UI 
 	 * rendered to a render target.
 	 */
-	UPROPERTY(EditAnywhere, Category=Rendering)
+	UPROPERTY(EditAnywhere, Category = Rendering)
 	float ParabolaDistortion;
 
 	/** Should the component tick the widget when it's off screen? */
@@ -294,27 +294,27 @@ protected:
 
     /* MATERIALS BEGIN */
 	/** The material instance for translucent widget components */
-	UPROPERTY(EditAnywhere, Category=Material)
+	UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* TranslucentMaterial;
 
 	/** The material instance for translucent, one-sided widget components */
-    UPROPERTY(EditAnywhere, Category = Material)
+    UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* TranslucentMaterial_OneSided;
 
 	/** The material instance for opaque widget components */
-    UPROPERTY(EditAnywhere, Category = Material)
+    UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* OpaqueMaterial;
 
 	/** The material instance for opaque, one-sided widget components */
-    UPROPERTY(EditAnywhere, Category = Material)
+    UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* OpaqueMaterial_OneSided;
 
 	/** The material instance for masked widget components. */
-    UPROPERTY(EditAnywhere, Category = Material)
+    UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* MaskedMaterial;
 
 	/** The material instance for masked, one-sided widget components. */
-    UPROPERTY(EditAnywhere, Category = Material)
+    UPROPERTY(EditAnywhere, Category = UserInterface)
 	UMaterialInterface* MaskedMaterial_OneSided;
 
     /* MATERIALS END */
