@@ -10,26 +10,8 @@
 
 struct FVirtualPointerPosition;
 
-//UENUM(BlueprintType)
-//enum class EWidgetBlendMode : uint8
-//{
-//	Opaque,
-//	Masked,
-//	Transparent
-//};
 
-
-/**
- * Beware! This feature is experimental and may be substantially changed or removed in future releases.
- * A 3D instance of a Widget Blueprint that can be interacted with in the world.
- *
- * SlateUI [Texture]
- * BackColor [Vector]
- * TintColorAndOpacity [Vector]
- * OpacityFromTexture [Scalar]
- * ParabolaDistortion [Scalar]
- */
-UCLASS(Blueprintable, ClassGroup=Experimental, hidecategories=(Object,Activation,"Components|Activation",Sockets,Base,Lighting,LOD,Mesh), editinlinenew, meta=(BlueprintSpawnableComponent, DevelopmentStatus=Experimental) )
+UCLASS(Blueprintable, hidecategories=(Object,Activation,"Components|Activation",Sockets,Base,Lighting,LOD,Mesh), editinlinenew, meta=(BlueprintSpawnableComponent) )
 class MESHWIDGET_API UMeshWidgetComponent : public UStaticMeshComponent
 {
 	GENERATED_UCLASS_BODY()
@@ -58,7 +40,7 @@ public:
 	// End MeshComponent
 	virtual UMaterialInterface* GetBaseMaterial() const;
 
-	// FActorComponentInstanceData* GetComponentInstanceData() const override;
+	FActorComponentInstanceData* GetComponentInstanceData() const override;
 	
 	void ApplyComponentInstanceData(class FMeshWidgetComponentInstanceData* WidgetInstanceData);
 

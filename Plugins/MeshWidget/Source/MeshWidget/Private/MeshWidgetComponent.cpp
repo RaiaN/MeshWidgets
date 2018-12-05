@@ -307,24 +307,24 @@ public:
 		CastChecked<UMeshWidgetComponent>(Component)->ApplyComponentInstanceData(this);
 	}
 
-	/*virtual void AddReferencedObjects(FReferenceCollector& Collector) override
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override
 	{
 		FSceneComponentInstanceData::AddReferencedObjects(Collector);
 
 		UClass* WidgetUClass = *WidgetClass;
 		Collector.AddReferencedObject(WidgetUClass);
 		Collector.AddReferencedObject(RenderTarget);
-	}*/
+	}
 
 public:
 	TSubclassOf<UUserWidget> WidgetClass;
 	UTextureRenderTarget2D* RenderTarget;
 };
 
-/*FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
+FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
 {
 	return new FMeshWidgetComponentInstanceData(this);
-}*/
+}
 
 void UMeshWidgetComponent::ApplyComponentInstanceData(FMeshWidgetComponentInstanceData* WidgetInstanceData)
 {
