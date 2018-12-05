@@ -24,22 +24,22 @@
 
 DECLARE_CYCLE_STAT(TEXT("3DHitTesting"), STAT_Slate3DHitTesting, STATGROUP_Slate);
 
-UMeshWidgetComponent::UMeshWidgetComponent( const FObjectInitializer& PCIP )
-	: Super( PCIP )
-	, DrawSize( FIntPoint( 500, 500 ) )
+UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
+	: Super(PCIP)
+	, DrawSize(FIntPoint(500, 500))
 	, bManuallyRedraw(false)
 	, bRedrawRequested(true)
 	, RedrawTime(0)
 	, LastWidgetRenderTime(0)
 	, bWindowFocusable(true)
-	, BackgroundColor( FLinearColor::Transparent )
-	, TintColorAndOpacity( FLinearColor::White )
-	, OpacityFromTexture( 1.0f )
+	, BackgroundColor(FLinearColor::Transparent)
+	, TintColorAndOpacity(FLinearColor::White)
+	, OpacityFromTexture(1.0f)
 	, BlendMode( EWidgetBlendMode::Masked )
-	, bIsOpaque_DEPRECATED( false )
-	, bIsTwoSided( false )
-	, ParabolaDistortion( 0 )
-	, TickWhenOffscreen( false )
+	, bIsOpaque_DEPRECATED(false)
+	, bIsTwoSided(false)
+	, ParabolaDistortion(0)
+	, TickWhenOffscreen(false)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -85,6 +85,8 @@ void UMeshWidgetComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UMeshWidgetComponent::OnRegister()
 {
+    UE_LOG(LogTemp, Log, TEXT("OnRegister"));
+
 	Super::OnRegister();
 
 	if (!WidgetRenderer.IsValid() && !GUsingNullRHI)
@@ -97,26 +99,23 @@ void UMeshWidgetComponent::OnRegister()
 
 void UMeshWidgetComponent::OnUnregister()
 {
-#if WITH_EDITOR
-	if (!GetWorld()->IsGameWorld())
-	{
-		ReleaseResources();
-	}
-#endif
+    UE_LOG(LogTemp, Log, TEXT("OnUnregister"));
 
-	Super::OnUnregister();
+    Super::OnUnregister();    
+
+    ReleaseResources();
 }
 
-void UMeshWidgetComponent::DestroyComponent(bool bPromoteChildren/*= false*/)
+void UMeshWidgetComponent::DestroyComponent(bool bPromoteChildren)
 {
-	Super::DestroyComponent(bPromoteChildren);
+    Super::DestroyComponent();
 
-	ReleaseResources();
+    ReleaseResources();
 }
 
 FPrimitiveSceneProxy* UMeshWidgetComponent::CreateSceneProxy()
 {
-	if ( WidgetRenderer.IsValid() )
+	if (WidgetRenderer.IsValid())
 	{
 		// Create a new MID for the current base material
 		UMaterialInterface* BaseMaterial = GetBaseMaterial();
@@ -139,15 +138,35 @@ FPrimitiveSceneProxy* UMeshWidgetComponent::CreateSceneProxy()
 	return nullptr;
 }
 
+void UMeshWidgetComponent::InitWidget()
+{
+    // Don't do any work if Slate is not initialized
+    if (FSlateApplication::IsInitialized())
+    {
+        if (WidgetClass && !IsValid(Widget) && GetWorld())
+        {
+            Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+        }
+
+#if WITH_EDITOR
+        if (IsValid(Widget) && !GetWorld()->IsGameWorld() && !bEditTimeUsable)
+        {
+            // Prevent native ticking of editor component previews
+            Widget->SetDesignerFlags(EWidgetDesignFlags::Designing);
+        }
+#endif
+    }
+}
+
 void UMeshWidgetComponent::ReleaseResources()
 {
-	if ( Widget  )
-	{
-		Widget = nullptr;
-	}
+    UE_LOG(LogTemp, Log, TEXT("ReleaseResources"));
 
-	WidgetRenderer.Reset();
+    // do not reset widget renderer manually since it implements FDeferredCleanupInterface
+	// WidgetRenderer.Reset();
+
 	HitTestGrid.Reset();
+    CurrentSlateWidget.Reset();
 
     SlateWidget.Reset();
     NewSlateWidget.Reset();
@@ -183,7 +202,7 @@ void UMeshWidgetComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    UpdateWidget();
+     UpdateWidget();
 
     if (!IsValid(Widget) && !SlateWidget.IsValid())
     {
@@ -199,12 +218,12 @@ void UMeshWidgetComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 bool UMeshWidgetComponent::ShouldDrawWidget() const
 {
 	const float RenderTimeThreshold = .5f;
-	if ( IsVisible() )
+	if (IsVisible())
 	{
 		// If we don't tick when off-screen, don't bother ticking if it hasn't been rendered recently
-		if ( TickWhenOffscreen || GetWorld()->TimeSince(LastRenderTime) <= RenderTimeThreshold )
+		if (TickWhenOffscreen || GetWorld()->TimeSince(LastRenderTime) <= RenderTimeThreshold)
 		{
-			if ( GetWorld()->TimeSince(LastWidgetRenderTime) >= RedrawTime )
+			if (GetWorld()->TimeSince(LastWidgetRenderTime) >= RedrawTime)
 			{
 				return bManuallyRedraw ? bRedrawRequested : true;
 			}
@@ -261,13 +280,13 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 
 	bRedrawRequested = false;
 
-	WidgetRenderer->DrawWindow(
-		RenderTarget,
-		HitTestGrid.ToSharedRef(),
-		SlateWindow.ToSharedRef(),
-		DrawScale,
-		CurrentDrawSize,
-		DeltaTime
+    WidgetRenderer->DrawWindow(
+        RenderTarget,
+        HitTestGrid.ToSharedRef(),
+        SlateWindow.ToSharedRef(),
+        DrawScale,
+        CurrentDrawSize,
+        DeltaTime
     );
 
 	LastWidgetRenderTime = GetWorld()->TimeSeconds;
@@ -288,24 +307,24 @@ public:
 		CastChecked<UMeshWidgetComponent>(Component)->ApplyComponentInstanceData(this);
 	}
 
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override
+	/*virtual void AddReferencedObjects(FReferenceCollector& Collector) override
 	{
 		FSceneComponentInstanceData::AddReferencedObjects(Collector);
 
 		UClass* WidgetUClass = *WidgetClass;
 		Collector.AddReferencedObject(WidgetUClass);
 		Collector.AddReferencedObject(RenderTarget);
-	}
+	}*/
 
 public:
 	TSubclassOf<UUserWidget> WidgetClass;
 	UTextureRenderTarget2D* RenderTarget;
 };
 
-FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
+/*FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
 {
 	return new FMeshWidgetComponentInstanceData(this);
-}
+}*/
 
 void UMeshWidgetComponent::ApplyComponentInstanceData(FMeshWidgetComponentInstanceData* WidgetInstanceData)
 {
@@ -379,32 +398,9 @@ void UMeshWidgetComponent::PostEditChangeProperty(FPropertyChangedEvent& Propert
 }
 #endif
 
-void UMeshWidgetComponent::InitWidget()
-{
-	// Don't do any work if Slate is not initialized
-	if ( FSlateApplication::IsInitialized() )
-	{
-		if ( WidgetClass && !IsValid(Widget) && GetWorld() )
-		{
-			Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-		}
-		
-#if WITH_EDITOR
-		if ( IsValid(Widget) && !GetWorld()->IsGameWorld() && !bEditTimeUsable )
-		{
-			if( !GEnableVREditorHacks )
-			{
-				// Prevent native ticking of editor component previews
-				Widget->SetDesignerFlags(EWidgetDesignFlags::Designing);
-			}
-		}
-#endif
-	}
-}
-
 void UMeshWidgetComponent::SetOwnerPlayer(ULocalPlayer* LocalPlayer)
 {
-	if ( OwnerPlayer != LocalPlayer )
+	if (OwnerPlayer != LocalPlayer)
 	{
 		OwnerPlayer = LocalPlayer;
 	}
@@ -570,7 +566,7 @@ FVector2D UMeshWidgetComponent::GetLocalHitLocation(const FHitResult& Hit) const
 {
 	FVector2D UV;
 	UGameplayStatics::FindCollisionUV(Hit, 0, UV);
-	UE_LOG(LogTemp, Warning, TEXT("%f %f"), UV.X, UV.Y);
+	// UE_LOG(LogTemp, Warning, TEXT("%f %f"), UV.X, UV.Y);
 
 	return FVector2D(DrawSize.X * UV.X, DrawSize.Y * UV.Y);
 }

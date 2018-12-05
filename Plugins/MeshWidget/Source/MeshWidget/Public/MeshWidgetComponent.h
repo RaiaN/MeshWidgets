@@ -40,10 +40,13 @@ public:
 
 	/* UPrimitiveComponent Interface */
 	virtual void OnRegister() override;
-	virtual void OnUnregister() override;
-	virtual void DestroyComponent(bool bPromoteChildren = false) override;
+    virtual void OnUnregister() override;
+    virtual void DestroyComponent(bool bPromoteChildren /* = false */) override;
+
+
 	virtual FPrimitiveSceneProxy* CreateSceneProxy() override;
 	int32 GetNumMaterials() const override;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 	// Begin UObject
@@ -55,7 +58,7 @@ public:
 	// End MeshComponent
 	virtual UMaterialInterface* GetBaseMaterial() const;
 
-	FActorComponentInstanceData* GetComponentInstanceData() const override;
+	// FActorComponentInstanceData* GetComponentInstanceData() const override;
 	
 	void ApplyComponentInstanceData(class FMeshWidgetComponentInstanceData* WidgetInstanceData);
 
