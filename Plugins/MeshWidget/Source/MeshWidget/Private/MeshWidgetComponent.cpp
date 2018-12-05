@@ -202,7 +202,7 @@ void UMeshWidgetComponent::TickComponent(float DeltaTime, enum ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-     UpdateWidget();
+    UpdateWidget();
 
     if (!IsValid(Widget) && !SlateWidget.IsValid())
     {
