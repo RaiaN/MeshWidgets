@@ -265,7 +265,8 @@ void UMeshWidgetInteractionComponent::SimulatePointerMovement()
 		PressedKeys,
 		FKey(),
 		0.0f,
-		ModifierKeys);
+		ModifierKeys
+    );
 	
 	if (WidgetPathUnderFinger.IsValid())
 	{
