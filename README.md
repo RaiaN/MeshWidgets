@@ -11,8 +11,7 @@ Includes:
 
 Requirements:
 
- * UE 4.13 (binaries built for 4.13-preview-3)
- * UV hit testing project setting (Physics > Optimization > Support UV From Hit Results) ticked
+ * UE 4.21
 
 Installation:
 
