@@ -36,7 +36,6 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 	, TintColorAndOpacity(FLinearColor::White)
 	, OpacityFromTexture(1.0f)
 	, BlendMode(EWidgetBlendMode::Masked)
-	, bIsOpaque_DEPRECATED(false)
 	, bIsTwoSided(false)
 	, ParabolaDistortion(0)
 	, TickWhenOffscreen(false)
@@ -70,8 +69,6 @@ UMeshWidgetComponent::UMeshWidgetComponent(const FObjectInitializer& PCIP)
 
 	LastLocalHitLocation = FVector2D::ZeroVector;
 	bUseEditorCompositing = false;
-
-	bUseLegacyRotation = false;
 
 	Pivot = FVector2D(0.5, 0.5);
 
@@ -255,21 +252,18 @@ void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 
 	const float DrawScale = 1.0f;
 
-	if (bDrawAtDesiredSize)
-	{
-		SlateWindow->SlatePrepass(DrawScale);
+    if (bDrawAtDesiredSize)
+    {
+        SlateWindow->SlatePrepass(DrawScale);
 
-		FVector2D DesiredSize = SlateWindow->GetDesiredSize();
-		DesiredSize.X = FMath::RoundToInt(DesiredSize.X);
-		DesiredSize.Y = FMath::RoundToInt(DesiredSize.Y);
-		CurrentDrawSize = DesiredSize.IntPoint();
+        FVector2D DesiredSize = SlateWindow->GetDesiredSize();
+        DesiredSize.X = FMath::RoundToInt(DesiredSize.X);
+        DesiredSize.Y = FMath::RoundToInt(DesiredSize.Y);
 
-		WidgetRenderer->SetIsPrepassNeeded(false);
-	}
-	else
-	{
-		WidgetRenderer->SetIsPrepassNeeded(true);
-	}
+        CurrentDrawSize = DesiredSize.IntPoint();
+    }
+
+    WidgetRenderer->SetIsPrepassNeeded(!bDrawAtDesiredSize);
 
 	if (CurrentDrawSize != DrawSize)
 	{
@@ -489,79 +483,6 @@ void UMeshWidgetComponent::UpdateWidget()
 	}
 }
 
-void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
-{
-	bool bWidgetRenderStateDirty = false;
-	bool bClearColorChanged = false;
-
-	FLinearColor ActualBackgroundColor = BackgroundColor;
-	switch (BlendMode)
-	{
-	    case EWidgetBlendMode::Opaque:
-		    ActualBackgroundColor.A = 1.0f;
-	    case EWidgetBlendMode::Masked:
-		    ActualBackgroundColor.A = 0.0f;
-	}
-
-	if (DesiredRenderTargetSize.X != 0 && DesiredRenderTargetSize.Y != 0)
-	{
-		if (RenderTarget == nullptr)
-		{
-			RenderTarget = NewObject<UTextureRenderTarget2D>(this);
-			RenderTarget->ClearColor = ActualBackgroundColor;
-
-			bClearColorChanged = bWidgetRenderStateDirty = true;
-
-			RenderTarget->InitCustomFormat(DesiredRenderTargetSize.X, DesiredRenderTargetSize.Y, PF_B8G8R8A8, false);
-
-			MaterialInstance->SetTextureParameterValue("SlateUI", RenderTarget);
-		}
-		else
-		{
-			// Update the format
-			if (RenderTarget->SizeX != DesiredRenderTargetSize.X || RenderTarget->SizeY != DesiredRenderTargetSize.Y)
-			{
-				RenderTarget->InitCustomFormat(DesiredRenderTargetSize.X, DesiredRenderTargetSize.Y, PF_B8G8R8A8, false);
-				RenderTarget->UpdateResourceImmediate(false);
-				bWidgetRenderStateDirty = true;
-			}
-
-			// Update the clear color
-			if (RenderTarget->ClearColor != ActualBackgroundColor)
-			{
-				RenderTarget->ClearColor = ActualBackgroundColor;
-				bClearColorChanged = bWidgetRenderStateDirty = true;
-			}
-
-			if (bWidgetRenderStateDirty)
-			{
-				RenderTarget->UpdateResource();
-			}
-		}
-	}
-
-	if (RenderTarget)
-	{
-		// If the clear color of the render target changed, update the BackColor of the material to match
-		if (bClearColorChanged)
-		{
-			MaterialInstance->SetVectorParameterValue("BackColor", RenderTarget->ClearColor);
-		}
-
-		static FName ParabolaDistortionName(TEXT("ParabolaDistortion"));
-
-		float CurrentParabolaValue;
-		if (MaterialInstance->GetScalarParameterValue(ParabolaDistortionName, CurrentParabolaValue) && CurrentParabolaValue != ParabolaDistortion)
-		{
-			MaterialInstance->SetScalarParameterValue(ParabolaDistortionName, ParabolaDistortion);
-		}
-
-		if (bWidgetRenderStateDirty)
-		{
-			MarkRenderStateDirty();
-		}
-	}
-}
 
 FVector2D UMeshWidgetComponent::GetLocalHitLocation(const FHitResult& Hit) const
 {
@@ -705,26 +626,7 @@ void UMeshWidgetComponent::PostLoad()
 {
 	Super::PostLoad();
 
-	if (GetLinkerUE4Version() < VER_UE4_ADD_PIVOT_TO_WIDGET_COMPONENT)
-	{
-		Pivot = FVector2D(0, 0);
-	}
 
-	if (GetLinkerUE4Version() < VER_UE4_ADD_BLEND_MODE_TO_WIDGET_COMPONENT)
-	{
-		BlendMode = bIsOpaque_DEPRECATED ? EWidgetBlendMode::Opaque : EWidgetBlendMode::Transparent;
-	}
-
-	if (GetLinkerUE4Version() < VER_UE4_FIXED_DEFAULT_ORIENTATION_OF_WIDGET_COMPONENT)
-	{	
-		// This indicates the value does not differ from the default.  In some rare cases this could cause incorrect rotation for anyone who directly set a value of 0,0,0 for rotation
-		// However due to delta serialization we have no way to know if this value is actually different from the default so assume it is not.
-		if (RelativeRotation == FRotator::ZeroRotator)
-		{
-			RelativeRotation = FRotator(0.f, 0.f, 90.f);
-		}
-		bUseLegacyRotation = true;
-	}
 }
 
 UMaterialInterface* UMeshWidgetComponent::GetMaterial(int32 MaterialIndex) const
@@ -776,4 +678,87 @@ void UMeshWidgetComponent::UpdateMaterialInstanceParameters()
 void UMeshWidgetComponent::SetWidgetClass(TSubclassOf<UUserWidget> InWidgetClass)
 {
 	WidgetClass = InWidgetClass;
+}
+
+
+/* PRIVATE */
+
+void UMeshWidgetComponent::UpdateRenderTarget(FIntPoint DesiredRenderTargetSize)
+{
+    bool bWidgetRenderStateDirty = false;
+    bool bClearColorChanged = false;
+
+    FLinearColor ActualBackgroundColor = BackgroundColor;
+    switch (BlendMode)
+    {
+        case EWidgetBlendMode::Opaque:
+        {
+            ActualBackgroundColor.A = 1.0f;
+            break;
+        }
+            
+        case EWidgetBlendMode::Masked:
+        {
+            ActualBackgroundColor.A = 0.0f;
+        }           
+    }
+
+    if (DesiredRenderTargetSize.X != 0 && DesiredRenderTargetSize.Y != 0)
+    {
+        if (RenderTarget == nullptr)
+        {
+            RenderTarget = NewObject<UTextureRenderTarget2D>(this);
+            RenderTarget->ClearColor = ActualBackgroundColor;
+
+            bClearColorChanged = bWidgetRenderStateDirty = true;
+
+            RenderTarget->InitCustomFormat(DesiredRenderTargetSize.X, DesiredRenderTargetSize.Y, PF_B8G8R8A8, false);
+
+            MaterialInstance->SetTextureParameterValue("SlateUI", RenderTarget);
+        }
+        else
+        {
+            // Update the format
+            if (RenderTarget->SizeX != DesiredRenderTargetSize.X || RenderTarget->SizeY != DesiredRenderTargetSize.Y)
+            {
+                RenderTarget->InitCustomFormat(DesiredRenderTargetSize.X, DesiredRenderTargetSize.Y, PF_B8G8R8A8, false);
+                RenderTarget->UpdateResourceImmediate(false);
+                bWidgetRenderStateDirty = true;
+            }
+
+            // Update the clear color
+            if (RenderTarget->ClearColor != ActualBackgroundColor)
+            {
+                RenderTarget->ClearColor = ActualBackgroundColor;
+                bClearColorChanged = bWidgetRenderStateDirty = true;
+            }
+
+            if (bWidgetRenderStateDirty)
+            {
+                RenderTarget->UpdateResource();
+            }
+        }
+    }
+
+    if (RenderTarget)
+    {
+        // If the clear color of the render target changed, update the BackColor of the material to match
+        if (bClearColorChanged)
+        {
+            MaterialInstance->SetVectorParameterValue("BackColor", RenderTarget->ClearColor);
+        }
+
+        static FName ParabolaDistortionName(TEXT("ParabolaDistortion"));
+
+        float CurrentParabolaValue;
+        if (MaterialInstance->GetScalarParameterValue(ParabolaDistortionName, CurrentParabolaValue) && CurrentParabolaValue != ParabolaDistortion)
+        {
+            MaterialInstance->SetScalarParameterValue(ParabolaDistortionName, ParabolaDistortion);
+        }
+
+        if (bWidgetRenderStateDirty)
+        {
+            MarkRenderStateDirty();
+        }
+    }
 }

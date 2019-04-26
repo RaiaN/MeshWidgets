@@ -57,9 +57,6 @@ public:
 	/** Ensures the 3d window is created its size and content. */
 	virtual void UpdateWidget();
 
-	/** Ensure the render target is initialized and updates it if needed. */
-	virtual void UpdateRenderTarget(FIntPoint DesiredRenderTargetSize);
-
 	/**
 	 * Converts a world-space hit result to a hit location on the widget
 	 * @param HitResult The hit on this widget in the world
@@ -161,9 +158,6 @@ public:
 	/** Get the fake window we create for widgets displayed in the world. */
 	TSharedPtr< SWindow > GetVirtualWindow() const;
 	
-	/** Whether or not this component uses legacy default rotation */
-	bool IsUsingLegacyRotation() const { return bUseLegacyRotation; }
-	
 	/** Updates the dynamic parameters on the material instance, without re-creating it */
 	void UpdateMaterialInstanceParameters();
 
@@ -261,9 +255,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Rendering)
 	EWidgetBlendMode BlendMode;
 
-	UPROPERTY()
-	bool bIsOpaque_DEPRECATED;
-
 	/** Is the component visible from behind? */
 	UPROPERTY(EditAnywhere, Category = Rendering)
 	bool bIsTwoSided;
@@ -327,9 +318,6 @@ protected:
 	UPROPERTY(Transient, DuplicateTransient)
 	UMaterialInstanceDynamic* MaterialInstance;
 
-	UPROPERTY()
-	bool bUseLegacyRotation;
-
 	UPROPERTY(Transient, DuplicateTransient)
 	bool bAddedToScreen;
 
@@ -355,4 +343,8 @@ protected:
 
 	/** Helper class for drawing widgets to a render target. */
 	TSharedPtr<class FWidgetRenderer> WidgetRenderer;
+
+private:
+    /** Ensure the render target is initialized and updates it if needed. */
+    void UpdateRenderTarget(FIntPoint DesiredRenderTargetSize);
 };
