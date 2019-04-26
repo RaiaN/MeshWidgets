@@ -233,11 +233,6 @@ bool UMeshWidgetComponent::ShouldDrawWidget() const
 
 void UMeshWidgetComponent::DrawWidgetToRenderTarget(float DeltaTime)
 {
-    if (GUsingNullRHI)
-    {
-		return;
-	}
-
 	if (!SlateWindow.IsValid())
 	{
 		return;
