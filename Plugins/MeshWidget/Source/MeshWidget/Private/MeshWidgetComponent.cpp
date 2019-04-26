@@ -322,9 +322,9 @@ public:
 	UTextureRenderTarget2D* RenderTarget;
 };
 
-FActorComponentInstanceData* UMeshWidgetComponent::GetComponentInstanceData() const
+TStructOnScope<FActorComponentInstanceData> UMeshWidgetComponent::GetComponentInstanceData() const
 {
-	return new FMeshWidgetComponentInstanceData(this);
+    return MakeStructOnScope<FActorComponentInstanceData, FMeshWidgetComponentInstanceData>(this);
 }
 
 void UMeshWidgetComponent::ApplyComponentInstanceData(FMeshWidgetComponentInstanceData* WidgetInstanceData)
