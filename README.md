@@ -11,7 +11,7 @@ Includes:
 
 Requirements:
 
- * UE 4.21
+ * UE 4.22
 
 Installation:
 
